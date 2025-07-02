@@ -6,6 +6,6 @@ urlpatterns = [
     path('', HomeListView.as_view(), name='home'),
     path('search/', SearchView.as_view(), name='search'),
 
-    path('genre/<slug:slug>/', MoviesByGenre.as_view(), name='genre'),
-    path('movie/<slug:slug>/', MovieDetail.as_view(), name='movie')
+    path('genre/<slug:slug>', MoviesByGenre.as_view(), name='genre'),
+    path('movie/<slug:slug>.html', MovieDetail.as_view(), name='movie')
 ]
