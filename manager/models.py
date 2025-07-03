@@ -1,17 +1,23 @@
 from datetime import datetime
 
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.template.defaultfilters import slugify
 from django.db import models
 
 from .validators import validate_video_file_extension
 
 
 class Genres(models.Model):
-    name = models.CharField(max_length=150, unique=True, verbose_name='Nomi')
-    slug = models.SlugField(max_length=150, unique=True, verbose_name='Identifikator')
+    name = models.CharField(max_length=150, verbose_name='Nomi')
+    slug = models.SlugField(max_length=150, null=False, unique=True, verbose_name='Identifikator')
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Janr '
@@ -35,10 +41,10 @@ AGE_LIMIT = (
 
 class Movies(models.Model):
     name = models.CharField(max_length=150, verbose_name='Nomi')
-    slug = models.SlugField(max_length=150, unique=True, verbose_name='Identifikator')
+    slug = models.SlugField(max_length=150, null=False, unique=True, verbose_name='Identifikator')
     genre = models.ManyToManyField(Genres, related_name='genre', verbose_name='Janr')
     country = models.CharField(max_length=50, verbose_name='Davlati')
-    year = models.IntegerField(default=1900, verbose_name='Yili',
+    year = models.IntegerField(default=datetime.now().year, verbose_name='Yili',
                                validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)])
     language = models.CharField(max_length=13, choices=LANGUAGE_CHOICES, verbose_name='Tili')
     duration = models.CharField(max_length=20, default='1 soat 40 daqiqa', verbose_name='Davomiyligi')
@@ -49,6 +55,12 @@ class Movies(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Kino '
         verbose_name_plural = 'Kinolar'
+        ordering = ['-id']

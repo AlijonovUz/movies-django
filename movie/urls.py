@@ -21,6 +21,7 @@ from django.urls import path, include
 
 from manager.views import Custom404View
 
+handler403 = Custom404View.as_view()
 handler404 = Custom404View.as_view()
 handler500 = Custom404View.as_view()
 
